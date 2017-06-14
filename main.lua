@@ -2,15 +2,17 @@
 function love.load()
 
 	-- Initialize player characteristics
-	player = {x = 10, y = 10, w = 20, h = 20, horizontal_speed = 150, vertical_speed = 3}
+	player = {x = 10, y = 10, w = 20, h = 20, horizontal_speed = 150, max_fall_speed = 200}
+	current_horizontal_speed = 0
+	current_vertical_speed = 0
 	
 	-- Initialize world characteristics
-	gravity = -0.7
+	gravity = 10
 
 	-- Define platforms coordinates
 	ground = {x = 0, y = 580, w = 800, h = 20}
-	wall = {x = 400, y = 400, w = 100, h = 20}
-	level = {ground, wall}
+	wall = {x = 360, y = 500, w = 80, h = 80}
+	platforms = {ground, wall}
 
 end
  
@@ -45,21 +47,28 @@ function love.update(dt)
 	current_horizontal_speed = (left + right) * player.horizontal_speed;
 
 	--Calculate the vertical speed
+	if current_vertical_speed + gravity < player.max_fall_speed then
+		current_vertical_speed = current_vertical_speed + gravity;
+	else
+		current_vertical_speed = player.max_fall_speed
+	end
 
 
 	-- Move the player
 	player.x = player.x + current_horizontal_speed * dt
+	player.y = player.y + current_vertical_speed * dt
 
 	
---	if (place_meeting(x, y+vsp, obj_wall)) {
---		while(!place_meeting(x, y+sign(vsp), obj_wall)) {
---	        y += sign(vsp);
---	    }
---	}
---	else {
---	    y += vsp;
---	}
-
+	--[[
+	if (place_meeting(x, y+vsp, obj_wall)) {
+		while(!place_meeting(x, y+sign(vsp), obj_wall)) {
+        	y += sign(vsp);
+    	}
+	}
+	else {	    
+		y += vsp;
+	}
+	}]]--
 
 end
  
@@ -71,9 +80,10 @@ function love.draw()
 
     -- Draw the level
     love.graphics.setColor(255, 255, 255)
-    
-    love.graphics.rectangle("fill", ground.x, ground.y, ground.w, ground.h)
-    
+    for i, platform in ipairs(platforms) do
+    	love.graphics.rectangle("fill", platform.x, platform.y, platform.w, platform.h)
+    end
+
 end
 
 -- My functions
