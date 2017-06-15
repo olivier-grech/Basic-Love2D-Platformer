@@ -50,7 +50,10 @@ function love.update(dt)
 
 	-- Move the player
 	player.x = player.x + hsp * dt
-	player.y = player.y + vsp * dt
+
+	if not PlayerCheckGround() then
+		player.y = player.y + vsp * dt
+	end
 
 end
  
@@ -72,15 +75,21 @@ end
 
 -- Check for collision between to boxes
 function CheckCollision(x1, y1, w1, h1, x2, y2, w2, h2)
-	return x1 < x2+w2 and
-    	x2 < x1+w1 and
-        y1 < y2+h2 and
-        y2 < y1+h1
+	return x1 < x2 + w2 and
+    	x2 < x1 + w1 and
+        y1 < y2 + h2 and
+        y2 < y1 + h1
 end
 
--- Check if the given box is underneath the player
-function PlayerCheckGround(x, y, w, h)
-	return CheckCollision(x, y, w, h, player.x, player.y + player.h, player.w, 1)
+-- Check if there is ground underneath the player
+function PlayerCheckGround()
+	ret = false
+	for i, platform in ipairs(platforms) do
+		if CheckCollision(platform.x, platform.y, platform.w, platform.h, player.x, player.y + player.h, player.w, 1) then
+			ret = true
+		end
+	end
+	return ret
 end
 
 -- Check if the given box is underneath or above the player
@@ -92,5 +101,5 @@ end
 -- Check if the given box is left or right of the player
 function PlayerCheckLeftAndRight(x, y, w, h)
 	return CheckCollision(x, y, w, h, player.x - 1, player.y, 1, player.h) or
-		CheckCollision(x, y, w, h, player.x + player.w, player.y, 1, player.h) or
+		CheckCollision(x, y, w, h, player.x + player.w, player.y, 1, player.h) 
 end
