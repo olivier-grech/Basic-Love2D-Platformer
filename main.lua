@@ -1,4 +1,5 @@
--- Löve2D functions
+-- Löve2D functions --
+
 function love.load()
 
 	-- Initialize player characteristics
@@ -67,14 +68,29 @@ function love.draw()
 
 end
 
--- My functions
-function CheckCollision(x1,y1,w1,h1, x2,y2,w2,h2)
+-- My functions --
+
+-- Check for collision between to boxes
+function CheckCollision(x1, y1, w1, h1, x2, y2, w2, h2)
 	return x1 < x2+w2 and
     	x2 < x1+w1 and
         y1 < y2+h2 and
         y2 < y1+h1
 end
 
-function CheckGround(x,y,w,h)
-	return CheckCollision()
+-- Check if the given box is underneath the player
+function PlayerCheckGround(x, y, w, h)
+	return CheckCollision(x, y, w, h, player.x, player.y + player.h, player.w, 1)
+end
+
+-- Check if the given box is underneath or above the player
+function PlayerCheckGroundAndCeiling(x, y, w, h)
+	return CheckGround(x,y,w,h) or
+		CheckCollision(x, y, w, h, player.x, player.y - 1, player.w, 1)
+end
+
+-- Check if the given box is left or right of the player
+function PlayerCheckLeftAndRight(x, y, w, h)
+	return CheckCollision(x, y, w, h, player.x - 1, player.y, 1, player.h) or
+		CheckCollision(x, y, w, h, player.x + player.w, player.y, 1, player.h) or
 end
