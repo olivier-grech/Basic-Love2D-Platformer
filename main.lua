@@ -3,13 +3,13 @@
 function love.load()
 
 	-- Initialize player characteristics
-	player = {x = 10, y = 10, w = 20, h = 20, horizontal_speed = 150, jump_speed = 200}
+	player = {x = 10, y = 10, w = 20, h = 20, horizontal_speed = 10, jump_speed = 200}
 	hsp = 0
 	vsp = 0
 	
 	-- Initialize world characteristics
 	gravity = 10
-	fall_speed = 200
+	fall_speed = 10
 
 	-- Define platforms coordinates
 	ground = {x = 0, y = 580, w = 800, h = 20}
@@ -49,10 +49,32 @@ function love.update(dt)
 	end
 
 	-- Move the player
-	player.x = player.x + hsp * dt
+	if hsp >= 0 then
+		hoffset = player.w
+	else
+		hoffset = 0
+	end
 
-	if not PlayerCheckGround() then
-		player.y = player.y + vsp * dt
+	if vsp >= 0 then
+		voffset = player.h
+	else
+		voffset = 0
+	end
+
+	if CheckGroundAtPlace(player.x + hoffset + hsp, player.y) then
+		while not CheckGroundAtPlace(player.x + hoffset + Sign(hsp), player.y) do
+			player.x = player.x + Sign(hsp) 
+		end
+	else
+		player.x = player.x + hsp 
+	end
+
+	if CheckGroundAtPlace(player.x, player.y + voffset + vsp) then
+		while not CheckGroundAtPlace(player.x, player.y + voffset + Sign(vsp)) do
+			player.y = player.y + Sign(vsp) 
+		end
+	else
+		player.y = player.y + vsp 
 	end
 
 end
@@ -73,7 +95,7 @@ end
 
 -- My functions --
 
--- Check for collision between to boxes
+-- Check for overlap between to boxes
 function CheckCollision(x1, y1, w1, h1, x2, y2, w2, h2)
 	return x1 < x2 + w2 and
     	x2 < x1 + w1 and
@@ -81,25 +103,22 @@ function CheckCollision(x1, y1, w1, h1, x2, y2, w2, h2)
         y2 < y1 + h1
 end
 
--- Check if there is ground underneath the player
-function PlayerCheckGround()
+-- Check for presence of ground at given coordinates
+function CheckGroundAtPlace(x, y)
 	ret = false
 	for i, platform in ipairs(platforms) do
-		if CheckCollision(platform.x, platform.y, platform.w, platform.h, player.x, player.y + player.h, player.w, 1) then
+    	if CheckCollision(platform.x, platform.y, platform.w, platform.h, x, y, 1, 1) then
 			ret = true
 		end
+    end
+	return ret 
+end
+
+-- Return the sign of a given number
+function Sign(number)
+	if number >= 0 then
+		return 1
+	else 
+		return -1
 	end
-	return ret
-end
-
--- Check if the given box is underneath or above the player
-function PlayerCheckGroundAndCeiling(x, y, w, h)
-	return  CheckCollision(x, y, w, h, player.x, player.y + h , player.w, 1) or
-		CheckCollision(x, y, w, h, player.x, player.y - 1, player.w, 1)
-end
-
--- Check if the given box is left or right of the player
-function PlayerCheckLeftAndRight(x, y, w, h)
-	return CheckCollision(x, y, w, h, player.x - 1, player.y, 1, player.h) or
-		CheckCollision(x, y, w, h, player.x + player.w, player.y, 1, player.h) 
 end
