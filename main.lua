@@ -3,12 +3,12 @@
 function love.load()
 
 	-- Initialize player characteristics
-	player = {x = 10, y = 10, w = 20, h = 20, horizontal_speed = 10, jump_speed = 200}
+	player = {x = 10, y = 10, w = 20, h = 20, horizontalspeed = 10, jumpspeed = 30}
 	hsp = 0
 	vsp = 0
 	
 	-- Initialize world characteristics
-	gravity = 10
+	gravity = 1
 	fall_speed = 10
 
 	-- Define platforms coordinates
@@ -34,7 +34,7 @@ function love.update(dt)
 	end
 	
 	-- Calculate the horizontal speed
-	hsp = (left + right) * player.horizontal_speed;
+	hsp = (left + right) * player.horizontalspeed;
 
 	--Calculate the fall speed
 	if vsp + gravity < fall_speed then
@@ -44,8 +44,8 @@ function love.update(dt)
 	end
 
 	--Calculate the jump speed
-	if love.keyboard.isDown("up") then
-		vsp = vsp + player.jump_speed
+	if love.keyboard.isDown("up") and CheckGroundUnderneathPlayer() then
+		vsp = vsp - player.jumpspeed
 	end
 
 	-- Move the player
@@ -62,7 +62,7 @@ function love.update(dt)
 	end
 
 	if CheckGroundAtPlace(player.x + hoffset + hsp, player.y) then
-		while not CheckGroundAtPlace(player.x + hoffset + Sign(hsp), player.y) do
+		while not CheckGroundAtPlace(player.x + hoffset + Sign(hsp) - 1, player.y) do
 			player.x = player.x + Sign(hsp) 
 		end
 	else
@@ -70,7 +70,7 @@ function love.update(dt)
 	end
 
 	if CheckGroundAtPlace(player.x, player.y + voffset + vsp) then
-		while not CheckGroundAtPlace(player.x, player.y + voffset + Sign(vsp)) do
+		while not CheckGroundAtPlace(player.x, player.y + voffset + Sign(vsp) - 1) do
 			player.y = player.y + Sign(vsp) 
 		end
 	else
@@ -81,11 +81,11 @@ end
  
 function love.draw()
 
-	--Draw the player
+	 --Draw the player
     love.graphics.setColor(233, 30, 99)
     love.graphics.rectangle("fill", player.x, player.y, player.w, player.h)
 
-    -- Draw the level
+	-- Draw the level
     love.graphics.setColor(255, 255, 255)
     for i, platform in ipairs(platforms) do
     	love.graphics.rectangle("fill", platform.x, platform.y, platform.w, platform.h)
@@ -101,6 +101,17 @@ function CheckCollision(x1, y1, w1, h1, x2, y2, w2, h2)
     	x2 < x1 + w1 and
         y1 < y2 + h2 and
         y2 < y1 + h1
+end
+
+-- Check for presence of ground under the player
+function CheckGroundUnderneathPlayer()
+		ret = false
+	for i, platform in ipairs(platforms) do
+    	if CheckCollision(platform.x, platform.y, platform.w, platform.h, player.x, player.y + player.h, 1, 1) then
+			ret = true
+		end
+    end
+	return ret 
 end
 
 -- Check for presence of ground at given coordinates
