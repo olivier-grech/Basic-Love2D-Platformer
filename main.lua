@@ -94,7 +94,7 @@ end
 
 -- Check if the given box is underneath or above the player
 function PlayerCheckGroundAndCeiling(x, y, w, h)
-	return CheckGround(x,y,w,h) or
+	return  CheckCollision(x, y, w, h, player.x, player.y + h , player.w, 1) or
 		CheckCollision(x, y, w, h, player.x, player.y - 1, player.w, 1)
 end
 
