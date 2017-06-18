@@ -3,13 +3,13 @@
 function love.load()
 
 	-- Initialize player characteristics
-	player = {x = 10, y = 10, w = 20, h = 20, horizontalspeed = 10, jumpspeed = 30}
+	player = {x = 10, y = 10, w = 20, h = 20, horizontalspeed = 5, jumpspeed = 20}
 	hsp = 0
 	vsp = 0
 	
 	-- Initialize world characteristics
 	gravity = 1
-	fall_speed = 10
+	fall_speed = 7
 
 	-- Define platforms coordinates
 	ground = {x = 0, y = 580, w = 800, h = 20}
@@ -103,22 +103,22 @@ function CheckCollision(x1, y1, w1, h1, x2, y2, w2, h2)
         y2 < y1 + h1
 end
 
--- Check for presence of ground under the player
-function CheckGroundUnderneathPlayer()
-		ret = false
+-- Check for presence of ground at given coordinates
+function CheckGroundAtPlace(x, y)
+	ret = false
 	for i, platform in ipairs(platforms) do
-    	if CheckCollision(platform.x, platform.y, platform.w, platform.h, player.x, player.y + player.h, 1, 1) then
+    	if CheckCollision(platform.x, platform.y, platform.w, platform.h, x, y, 1, 1) then
 			ret = true
 		end
     end
 	return ret 
 end
 
--- Check for presence of ground at given coordinates
-function CheckGroundAtPlace(x, y)
-	ret = false
+-- Check for presence of ground under the player
+function CheckGroundUnderneathPlayer()
+		ret = false
 	for i, platform in ipairs(platforms) do
-    	if CheckCollision(platform.x, platform.y, platform.w, platform.h, x, y, 1, 1) then
+    	if CheckCollision(platform.x, platform.y, platform.w, platform.h, player.x, player.y + player.h, 1, 1) then
 			ret = true
 		end
     end
