@@ -3,18 +3,23 @@
 function love.load()
 
 	-- Initialize player characteristics
-	player = {x = 10, y = 10, w = 20, h = 20, horizontalspeed = 5, jumpspeed = 20}
+	player = {x = 100, y = 560, w = 20, h = 20, speed = 5, jumpspeed = 20}
 	hsp = 0
 	vsp = 0
 	
 	-- Initialize world characteristics
 	gravity = 1
-	fall_speed = 7
+	fallspeed = 7
 
 	-- Define platforms coordinates
 	ground = {x = 0, y = 580, w = 800, h = 20}
-	wall = {x = 360, y = 500, w = 80, h = 80}
-	platforms = {ground, wall}
+	ceiling = {x = 0, y = 0, w = 800, h = 20}
+	wallleft = {x = 0, y = 0, w = 20, h = 600}
+	wallright = {x = 780, y = 0, w = 20, h = 600}
+	platformcenter = {x = 360, y = 500, w = 80, h = 80}
+	platform1 = {x = 250, y = 500, w = 50, h = 30}
+	platform2 = {x = 500, y = 500, w = 50, h = 30}
+	platforms = {ground, ceiling, wallleft, wallright, platformcenter, platform1, platform2}
 
 end
  
@@ -34,17 +39,17 @@ function love.update(dt)
 	end
 	
 	-- Calculate the horizontal speed
-	hsp = (left + right) * player.horizontalspeed;
+	hsp = (left + right) * player.speed;
 
 	--Calculate the fall speed
-	if vsp + gravity < fall_speed then
+	if vsp + gravity < fallspeed then
 		vsp = vsp + gravity;
 	else
-		vsp = fall_speed
+		vsp = fallspeed
 	end
 
 	--Calculate the jump speed
-	if love.keyboard.isDown("up") and CheckGroundUnderneathPlayer() then
+	if love.keyboard.isDown("up") and CheckGroundAtPlace(player.x, player.y + player.h, 1, 1) then
 		vsp = vsp - player.jumpspeed
 	end
 
@@ -61,16 +66,16 @@ function love.update(dt)
 		voffset = 0
 	end
 
-	if CheckGroundAtPlace(player.x + hoffset + hsp, player.y) then
-		while not CheckGroundAtPlace(player.x + hoffset + Sign(hsp) - 1, player.y) do
+	if CheckGroundAtPlace(player.x + hoffset + hsp, player.y, 1, player.h) then
+		while not CheckGroundAtPlace(player.x + hoffset + Sign(hsp) - 1, player.y, 1, player.h) do
 			player.x = player.x + Sign(hsp) 
 		end
 	else
 		player.x = player.x + hsp 
 	end
 
-	if CheckGroundAtPlace(player.x, player.y + voffset + vsp) then
-		while not CheckGroundAtPlace(player.x, player.y + voffset + Sign(vsp) - 1) do
+	if CheckGroundAtPlace(player.x, player.y + voffset + vsp, player.w, 1) then
+		while not CheckGroundAtPlace(player.x, player.y + voffset + Sign(vsp) - 1, player.w, 1) do
 			player.y = player.y + Sign(vsp) 
 		end
 	else
@@ -104,21 +109,10 @@ function CheckCollision(x1, y1, w1, h1, x2, y2, w2, h2)
 end
 
 -- Check for presence of ground at given coordinates
-function CheckGroundAtPlace(x, y)
+function CheckGroundAtPlace(x, y, w, h)
 	ret = false
 	for i, platform in ipairs(platforms) do
-    	if CheckCollision(platform.x, platform.y, platform.w, platform.h, x, y, 1, 1) then
-			ret = true
-		end
-    end
-	return ret 
-end
-
--- Check for presence of ground under the player
-function CheckGroundUnderneathPlayer()
-		ret = false
-	for i, platform in ipairs(platforms) do
-    	if CheckCollision(platform.x, platform.y, platform.w, platform.h, player.x, player.y + player.h, 1, 1) then
+    	if CheckCollision(platform.x, platform.y, platform.w, platform.h, x, y, w, h) then
 			ret = true
 		end
     end
