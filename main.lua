@@ -25,25 +25,18 @@ end
  
 function love.update(dt)
 
-	-- Check whether the player is pressing some keys
+	-- Check whether the player is pressing some keys and calculate the horizontal speed
 	if love.keyboard.isDown("left") then
-		left = -1
-	else
-		left = 0
+		hsp = -player.speed
+	elseif love.keyboard.isDown("right") then
+		hsp = player.speed
+	else 
+		hsp = 0
 	end
-
-	if love.keyboard.isDown("right") then
-		right = 1
-	else
-		right = 0
-	end
-	
-	-- Calculate the horizontal speed
-	hsp = (left + right) * player.speed;
 
 	--Calculate the fall speed
 	if vsp + gravity < fallspeed then
-		vsp = vsp + gravity;
+		vsp = vsp + gravity
 	else
 		vsp = fallspeed
 	end
