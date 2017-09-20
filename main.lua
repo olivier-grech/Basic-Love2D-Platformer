@@ -2,7 +2,7 @@
 
 function love.load()
 
-	-- Initialize player characteristics
+ 	-- Initialize player characteristics
 	player = {x = 100, y = 560, w = 20, h = 20, speed = 5, jumpspeed = 20}
 	hsp = 0
 	vsp = 0
@@ -79,7 +79,7 @@ end
  
 function love.draw()
 
-	 --Draw the player
+	--Draw the player
     love.graphics.setColor(233, 30, 99)
     love.graphics.rectangle("fill", player.x, player.y, player.w, player.h)
 
